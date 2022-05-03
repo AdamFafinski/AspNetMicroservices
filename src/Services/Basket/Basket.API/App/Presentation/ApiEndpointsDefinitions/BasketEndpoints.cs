@@ -8,7 +8,7 @@ public static class BasketEndpoints
 {
     public static void Configure(WebApplication app)
     {
-        const string apiBasketBase = "api/v1/catalog";
+        const string apiBasketBase = "api/v1/basket";
 
         app.MapGet($"{apiBasketBase}/get-basket/{{userName}}", GetBasket)
             .Produces<AppResponse<ShoppingCartDto>>(StatusCodes.Status200OK)
