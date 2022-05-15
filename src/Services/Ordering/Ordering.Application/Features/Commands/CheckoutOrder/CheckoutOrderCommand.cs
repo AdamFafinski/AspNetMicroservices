@@ -1,7 +1,8 @@
 ﻿using MediatR;
+using Ordering.Application.Responses;
 
 namespace Ordering.Application.Features.Commands.CheckoutOrder;
-public class CheckoutOrderCommand : IRequest<int>
+public class CheckoutOrderCommand : IRequest<AppResponse<int>>
 {
     public string UserName { get; set; }
     public decimal TotalPrice { get; set; }

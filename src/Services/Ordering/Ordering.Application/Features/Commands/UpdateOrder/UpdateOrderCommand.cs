@@ -1,7 +1,8 @@
 ﻿using MediatR;
+using Ordering.Application.Responses;
 
 namespace Ordering.Application.Features.Commands.UpdateOrder;
-public class UpdateOrderCommand : IRequest
+public class UpdateOrderCommand : IRequest<AppResponse>
 {
     public int Id { get; set; }
     public string UserName { get; set; }

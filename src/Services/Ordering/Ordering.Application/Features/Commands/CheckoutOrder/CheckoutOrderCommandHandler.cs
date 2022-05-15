@@ -4,10 +4,11 @@ using Microsoft.Extensions.Logging;
 using Ordering.Application.Contracts.Infrastructure;
 using Ordering.Application.Contracts.Persistance;
 using Ordering.Application.Models;
+using Ordering.Application.Responses;
 using Ordering.Domain.Entities;
 
 namespace Ordering.Application.Features.Commands.CheckoutOrder;
-public class CheckoutOrderCommandHandler : IRequestHandler<CheckoutOrderCommand, int>
+public class CheckoutOrderCommandHandler : IRequestHandler<CheckoutOrderCommand, AppResponse<int>>
 {
     private readonly IOrderRepository _orderRepository;
     private readonly IMapper _mapper;
@@ -25,7 +26,7 @@ public class CheckoutOrderCommandHandler : IRequestHandler<CheckoutOrderCommand,
         _emailService = emailService;
         _logger = logger;
     }
-    public async Task<int> Handle(CheckoutOrderCommand request, CancellationToken cancellationToken)
+    public async Task<AppResponse<int>> Handle(CheckoutOrderCommand request, CancellationToken cancellationToken)
     {
         var newOrder = _mapper.Map<Order>(request);
 
@@ -35,7 +36,7 @@ public class CheckoutOrderCommandHandler : IRequestHandler<CheckoutOrderCommand,
 
         await SendEmail(newDbOrder);
 
-        return newDbOrder.Id;
+        return new AppResponse<int>(true, newDbOrder.Id);
     }
 
     private async Task SendEmail(Order newDbOrder)

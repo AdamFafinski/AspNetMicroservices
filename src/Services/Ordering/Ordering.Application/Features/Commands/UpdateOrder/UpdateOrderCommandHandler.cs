@@ -2,11 +2,13 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Ordering.Application.Contracts.Persistance;
+using Ordering.Application.Exceptions;
 using Ordering.Application.Features.Commands.CheckoutOrder;
-using Ordering.Domain.Entities;
+using Ordering.Application.Responses;
+using System.Net;
 
 namespace Ordering.Application.Features.Commands.UpdateOrder;
-public class UpdateOrderCommandHandler : IRequestHandler<UpdateOrderCommand>
+public class UpdateOrderCommandHandler : IRequestHandler<UpdateOrderCommand, AppResponse>
 {
     private readonly IOrderRepository _orderRepository;
     private readonly IMapper _mapper;
@@ -22,19 +24,17 @@ public class UpdateOrderCommandHandler : IRequestHandler<UpdateOrderCommand>
         _logger = logger;
     }
 
-    public async Task<Unit> Handle(UpdateOrderCommand request, CancellationToken cancellationToken)
+    public async Task<AppResponse> Handle(UpdateOrderCommand request, CancellationToken cancellationToken)
     {
         var dbOrder = await _orderRepository.GetByIdAsync(request.Id);
         if (dbOrder is null)
-        {
-            _logger.LogError("Order doesn't exist in database.");
-        }
+            throw new AppException(HttpStatusCode.NotFound, $"Order {request.Id} not found");
 
-        _mapper.Map<UpdateOrderCommand, Order>(request, dbOrder);
+        _mapper.Map(request, dbOrder);
 
         await _orderRepository.UpdateAsync(dbOrder);
         _logger.LogInformation("Order {OrderId} was succesfully updated.", dbOrder.Id);
 
-        return Unit.Value;
+        return new AppResponse(true, "Order updated");
     }
 }

@@ -1,14 +1,10 @@
 ﻿using AutoMapper;
 using MediatR;
 using Ordering.Application.Contracts.Persistance;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Ordering.Application.Responses;
 
 namespace Ordering.Application.Features.Queries.GetOrdersList;
-public class GetOrdersListQueryHandler : IRequestHandler<GetOrdersListQuery, List<OrderViewModel>>
+public class GetOrdersListQueryHandler : IRequestHandler<GetOrdersListQuery, AppResponse<List<OrderViewModel>>>
 {
     private readonly IOrderRepository _orderRepository;
     private readonly IMapper _mapper;
@@ -19,9 +15,12 @@ public class GetOrdersListQueryHandler : IRequestHandler<GetOrdersListQuery, Lis
         _mapper = mapper;
     }
 
-    public async Task<List<OrderViewModel>> Handle(GetOrdersListQuery request, CancellationToken cancellationToken)
+    public async Task<AppResponse<List<OrderViewModel>>> Handle(GetOrdersListQuery request, CancellationToken cancellationToken)
     {
         var dbOrders = await _orderRepository.GerOrdersByUserNameAsync(request.UserName);
-        return _mapper.Map<List<OrderViewModel>>(dbOrders);
+
+        var orders = _mapper.Map<List<OrderViewModel>>(dbOrders);
+
+        return new AppResponse<List<OrderViewModel>>(true, orders);
     }
 }
